@@ -23,7 +23,7 @@ public class DelayQueue {
      */
     private static List<TaskNode> taskNodes = new ArrayList<>();
     //private static
-    private static AtomicInteger currentIndex = new AtomicInteger(0);
+    public static AtomicInteger currentIndex = new AtomicInteger(0);
 
     /**
      * 初始对象锁
@@ -120,6 +120,7 @@ public class DelayQueue {
                 }
                 this.getQueues().get(nodeIndex).getTasks().add(task);
                 //落地数据
+                RedisUtil.getInstance().removeZsetByScore(REDIS_QUEUE_KEY,nodeIndex);
                 RedisUtil.getInstance().zadd(REDIS_QUEUE_KEY,nodeIndex, JSONObject.toJSONString(this.getQueues().get(nodeIndex)));
             }
         }
@@ -129,11 +130,9 @@ public class DelayQueue {
     /**
      * 移动环型节点，执行节点中的任务
      */
-    public void run() {
-        if (this.currentIndex.get() >= 3600) {
-            this.currentIndex.getAndSet(0);
-        }
-        TaskNode taskNode = this.getQueues().get(this.currentIndex.get());
+    public void run(int nodeIndex) {
+
+        TaskNode taskNode = this.getQueues().get(nodeIndex);
         if (taskNode.getTasks().size() > 0) {
             for (Task task : taskNode.getTasks()) {
                 boolean rs = task.run();
@@ -145,6 +144,5 @@ public class DelayQueue {
             RedisUtil.getInstance().removeZsetByScore(REDIS_QUEUE_KEY,taskNode.getNodeIndex());
             RedisUtil.getInstance().zadd(REDIS_QUEUE_KEY,taskNode.getNodeIndex(), JSONObject.toJSONString(taskNode));
         }
-        this.currentIndex.addAndGet(1);
     }
 }

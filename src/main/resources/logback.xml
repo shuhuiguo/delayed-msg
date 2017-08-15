@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!--定义日志文件的存储地址 勿在 LogBack的配置中使用相对路径 -->
+    <property name="LOG_DIR" value="/home/product/logs" />
+    <!--定义监控日志路径 -->
+    <!--项目名称 -->
+    <property name="PROJECT_NAME" value="delaed-msg"/>
+    <!--STDOUT 只用于开发环境  -->
+    <appender name="STDOUT_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- %.-1level 只显示信息级别的首字母,%-5level 左对齐显示信息级别全称 -->
+            <!-- 如需自定义关键字，用 %X{键名} 表示,程序中用MDC.put("键名","键值")设置，可动态设置 [%logger:%line] -->
+            <Pattern>[%date{yyyy-MM-dd HH:mm:ss}][%p][%X{MSG}][%C][%M][%L][%m]%n
+            </Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="ROOT_APPENDER"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 分包间隔是根据fileNamePattern中指定的事件最小单位，比如例子中的%d{yyyyMMddHH}的最小事件单位为小时，则每小时生成一个文件 -->
+            <FileNamePattern>${LOG_DIR}/${PROJECT_NAME}_logs/${PROJECT_NAME}_%d{yyyyMMddHH}.log
+            </FileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>[%date{yyyy-MM-dd HH:mm:ss}][%p][%X{MSG}][%C][%M][%L][%m]%n
+            </Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- ACCESS end -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="java.sql.Connection" level="INFO"/>
+    <logger name="java.sql.ResultSet" level="INFO"/>
+    <!-- 开发环境 level=DEBUG 生产为ERROR -->
+    <root level="INFO">
+        <!--STDOUT 只用于开发环境  -->
+        <appender-ref ref="STDOUT_APPENDER"/>
+        <appender-ref ref="ROOT_APPENDER"/>
+    </root>
+</configuration>
