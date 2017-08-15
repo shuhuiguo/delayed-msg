@@ -9,19 +9,28 @@ import com.shuhg.service.ThreadExecute;
  * Created by 大舒 on 2017/8/11.
  */
 public class Main {
-    ThreadExecute execute = new ThreadExecute();
+    final ThreadExecute execute = new ThreadExecute();
     public static int num = 3600;
 
+    public Main(){
+        //TODO 从redis恢复延时消息
+        execute.initMessage(null);
+    }
     public static void main(String[] args) {
-        ThreadExecute execute = new ThreadExecute();
+        Main main = new Main();
         ExecuteTaskService defaultService= new DefaultExecuteTaskServiceImpl();
         DelayMessage delayMessage = new DelayMessage();
         delayMessage.setDelayTime("0.2h,10s,20");
         delayMessage.setMsg("test msg!");
-        execute.addMessage(delayMessage,defaultService);
-        execute.run();
-
-
+        main.execute.addMessage(delayMessage,defaultService);
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                //程序退出时，把当前节点index写入redis
+                ThreadExecute.DELAY_CYCLE_QUEUE.syncCurrentIndex();
+            }
+        });
+        main.execute.run();
     }
 
 }

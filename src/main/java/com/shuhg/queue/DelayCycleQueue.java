@@ -3,11 +3,9 @@ package com.shuhg.queue;
 import com.alibaba.fastjson.JSONObject;
 import com.shuhg.service.ExecuteTaskService;
 import com.shuhg.utils.RedisUtil;
+import redis.clients.jedis.Tuple;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,13 +15,15 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by 大舒 on 2017/8/10.
  */
 public class DelayCycleQueue {
+
     private static String REDIS_QUEUE_KEY="delay_queue_msg";
+    private static String REDIS_DELAY_QUEUE_CURRENT_INDEX ="delay_queue_current_index";
     /**
      * 任务环
      */
     private static List<TaskNode> taskNodes = new ArrayList<>();
     //private static
-    public static AtomicInteger currentIndex = new AtomicInteger(0);
+    private static AtomicInteger currentIndex = new AtomicInteger(0);
 
     /**
      * 初始对象锁
@@ -118,15 +118,50 @@ public class DelayCycleQueue {
                 if (nodeIndex != 0) {
                     nodeIndex--;
                 }
-                this.getQueues().get(nodeIndex).getTasks().add(task);
-                //落地数据
-                RedisUtil.getInstance().removeZsetByScore(REDIS_QUEUE_KEY,nodeIndex);
-                RedisUtil.getInstance().zadd(REDIS_QUEUE_KEY,nodeIndex, JSONObject.toJSONString(this.getQueues().get(nodeIndex)));
+                addMessage(nodeIndex,task);
             }
         }
         return this.taskNodes;
     }
 
+    /**
+     * 添加延时消息
+     * @param nodeIndex 节点ID
+     * @param task 任务
+     */
+    public void addMessage(int nodeIndex,Task task) {
+        this.getQueues().get(nodeIndex).getTasks().add(task);
+        syncNodeData(nodeIndex,this.getQueues().get(nodeIndex));
+    }
+
+    public void initCurrentIndex() {
+
+        String index = RedisUtil.getInstance().get(REDIS_DELAY_QUEUE_CURRENT_INDEX);
+        if(index == null){
+            setCurrentIndex(0);
+        }else {
+            setCurrentIndex(Integer.parseInt(index));
+        }
+
+    }
+    public void setCurrentIndex(int index){
+        this.currentIndex.getAndSet(index);
+    }
+
+    public int getCurrentIndex(){
+        return this.currentIndex.get();
+    }
+    public int addAndGetCurrentIndex(int index){
+        return this.currentIndex.addAndGet(index);
+    }
+
+    public void syncCurrentIndex(){
+        RedisUtil.getInstance().set(REDIS_DELAY_QUEUE_CURRENT_INDEX,String.valueOf(getCurrentIndex()));
+    }
+
+    public Set<Tuple> getAllDelayMessage(){
+       return RedisUtil.getInstance().zrange(REDIS_QUEUE_KEY,0,-1);
+    }
     /**
      * 移动环型节点，执行节点中的任务
      */
@@ -140,9 +175,19 @@ public class DelayCycleQueue {
                     taskNode.getTasks().remove(task);
                 }
             }
-            //落地数据
-            RedisUtil.getInstance().removeZsetByScore(REDIS_QUEUE_KEY,taskNode.getNodeIndex());
-            RedisUtil.getInstance().zadd(REDIS_QUEUE_KEY,taskNode.getNodeIndex(), JSONObject.toJSONString(taskNode));
+          syncNodeData(taskNode.getNodeIndex(),taskNode);
         }
+    }
+
+    /**
+     * 同步节点数据到redis
+     * @param nodeIndex
+     * @param taskNode
+     */
+    public void syncNodeData(int nodeIndex,TaskNode taskNode){
+        //落地数据
+        RedisUtil.getInstance().removeZsetByScore(REDIS_QUEUE_KEY,taskNode.getNodeIndex());
+        RedisUtil.getInstance().zadd(REDIS_QUEUE_KEY,taskNode.getNodeIndex(), JSONObject.toJSONString(taskNode));
+
     }
 }

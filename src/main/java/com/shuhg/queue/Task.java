@@ -30,27 +30,37 @@ public class Task {
      * 实际方法执行类
      */
     private ExecuteTaskService taskService;
-
+    public Task(){}
     public Task(int cycleNum, DelayMessage delayMessage, ExecuteTaskService taskService) {
         this.cycleNum = cycleNum;
         this.delayMessage = delayMessage;
         this.taskService = taskService;
     }
 
-
+    /**
+     * 执行任务
+     * @return
+     */
     public boolean run() {
         SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+
         try {
             if (this.cycleNum == 0) {
-                //TODO
-                LOGGER.info("发现任务！--- {}",df.format(new Date()));
-
+                Date now = new Date();
+                LOGGER.info("发现任务！--- {}", df.format(now));
                 taskService.taskFun(this.delayMessage);
+                //当前时间和task时间预期执行时间相差5S，不执行任务
+                if ((now.getTime()-this.executeDate.getTime() ) > 5000) {
+                    //TODO 暂时取消 实际不判断时间有效期
+                    //taskService.taskFun(this.delayMessage);
+                }else {
+                    LOGGER.warn("当前时间--{}与任务预期执行时间--{}相差大于5S",df.format(now),df.format(this.executeDate.getTime()));
+                }
                 return true;
             } else {
 
                 //System.out.println("开始执行：" + Main.num + "   " + df.format(new Date()));
-                LOGGER.info("任务未到时间！--- {}" , df.format(new Date()));
+                LOGGER.info("任务未到时间！--- {}", df.format(new Date()));
                 this.cycleNum--;
                 return false;
             }
@@ -83,5 +93,9 @@ public class Task {
 
     public void setDelayMessage(DelayMessage delayMessage) {
         this.delayMessage = delayMessage;
+    }
+
+    public void setTaskService(ExecuteTaskService taskService) {
+        this.taskService = taskService;
     }
 }

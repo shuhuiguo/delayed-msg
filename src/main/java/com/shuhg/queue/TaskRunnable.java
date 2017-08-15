@@ -23,23 +23,21 @@ public class TaskRunnable implements Runnable {
     @Override
     public void run() {
         SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
-        LOGGER.info("开始执行：{}   当前节点：{}", DelayCycleQueue.currentIndex.get() ,df.format(new Date()));
-        if (DelayCycleQueue.currentIndex.get() >= 3600) {
-            DelayCycleQueue.currentIndex.getAndSet(0);
+        LOGGER.debug("开始执行：{}   当前节点：{}", delayCycleQueue.getCurrentIndex() ,df.format(new Date()));
+        //当节点大于3600，重新开始循环
+        if (delayCycleQueue.getCurrentIndex()>= 3600) {
+            delayCycleQueue.setCurrentIndex(0);
         }
+        //TODO 同步index到redis
+        final int index = delayCycleQueue.getCurrentIndex();
         executorService.submit( new Runnable(){
 
             @Override
             public void run() {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                delayCycleQueue.run(DelayCycleQueue.currentIndex.get());
+                delayCycleQueue.run(index);
             }
         });
-        DelayCycleQueue.currentIndex.addAndGet(1);
+        delayCycleQueue.addAndGetCurrentIndex(1);
 
     }
 }
