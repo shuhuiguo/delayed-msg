@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 共 3600个节点，每次定时任务向前移动一个节点
  * Created by 大舒 on 2017/8/10.
  */
-public class DelayQueue {
+public class DelayCycleQueue {
     private static String REDIS_QUEUE_KEY="delay_queue_msg";
     /**
      * 任务环

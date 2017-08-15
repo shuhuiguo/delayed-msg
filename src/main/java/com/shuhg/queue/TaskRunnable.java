@@ -14,18 +14,18 @@ import java.util.concurrent.Executors;
 public class TaskRunnable implements Runnable {
     private static Logger LOGGER = LoggerFactory.getLogger(TaskRunnable.class);
     private ExecutorService executorService = Executors.newFixedThreadPool(100);
-    private DelayQueue delayQueue;
+    private DelayCycleQueue delayCycleQueue;
 
-    public TaskRunnable(DelayQueue delayQueue){
-        this.delayQueue = delayQueue;
+    public TaskRunnable(DelayCycleQueue delayCycleQueue){
+        this.delayCycleQueue = delayCycleQueue;
     }
 
     @Override
     public void run() {
         SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
-        LOGGER.info("开始执行：{}   当前节点：{}", DelayQueue.currentIndex.get() ,df.format(new Date()));
-        if (DelayQueue.currentIndex.get() >= 3600) {
-            DelayQueue.currentIndex.getAndSet(0);
+        LOGGER.info("开始执行：{}   当前节点：{}", DelayCycleQueue.currentIndex.get() ,df.format(new Date()));
+        if (DelayCycleQueue.currentIndex.get() >= 3600) {
+            DelayCycleQueue.currentIndex.getAndSet(0);
         }
         executorService.submit( new Runnable(){
 
@@ -36,10 +36,10 @@ public class TaskRunnable implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                delayQueue.run(DelayQueue.currentIndex.get());
+                delayCycleQueue.run(DelayCycleQueue.currentIndex.get());
             }
         });
-        DelayQueue.currentIndex.addAndGet(1);
+        DelayCycleQueue.currentIndex.addAndGet(1);
 
     }
 }

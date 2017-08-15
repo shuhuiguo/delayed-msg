@@ -1,7 +1,7 @@
 package com.shuhg.service;
 
 import com.shuhg.queue.DelayMessage;
-import com.shuhg.queue.DelayQueue;
+import com.shuhg.queue.DelayCycleQueue;
 import com.shuhg.queue.TaskRunnable;
 
 import java.util.concurrent.Executors;
@@ -13,15 +13,15 @@ import java.util.concurrent.TimeUnit;
  * Created by 大舒 on 2017/8/11.
  */
 public class ThreadExecute {
-    final static DelayQueue delayQueue = new DelayQueue();
+    final static DelayCycleQueue DELAY_CYCLE_QUEUE = new DelayCycleQueue();
     ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
     public void addMessage(DelayMessage delayMessage, ExecuteTaskService executeTaskService) {
-        delayQueue.addMessage(delayMessage, executeTaskService);
+        DELAY_CYCLE_QUEUE.addMessage(delayMessage, executeTaskService);
     }
 
     public void run() {
-        ScheduledFuture scheduledFuture = executorService.scheduleAtFixedRate(new TaskRunnable(this.delayQueue), 2, 1, TimeUnit.SECONDS);
+        ScheduledFuture scheduledFuture = executorService.scheduleAtFixedRate(new TaskRunnable(this.DELAY_CYCLE_QUEUE), 2, 1, TimeUnit.SECONDS);
     }
 
 }
