@@ -15,15 +15,15 @@ import java.util.concurrent.TimeUnit;
  * Created by 大舒 on 2017/8/11.
  */
 public class ThreadExecute {
-    public final static DelayCycleQueue DELAY_CYCLE_QUEUE = new DelayCycleQueue();
+    public static DelayCycleQueue delayCycleQueue = new DelayCycleQueue();
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
     public void addMessage(DelayMessage delayMessage, ExecuteTaskService executeTaskService) {
-        DELAY_CYCLE_QUEUE.addMessage(delayMessage, executeTaskService);
+        delayCycleQueue.addMessage(delayMessage, executeTaskService);
     }
 
     public void addMessage(Task task, int nodeIndex) {
-        DELAY_CYCLE_QUEUE.addMessage(nodeIndex, task);
+        delayCycleQueue.addMessage(nodeIndex, task);
     }
 
     /**
@@ -31,7 +31,7 @@ public class ThreadExecute {
      * @param executeTaskServiceMap 消息类型-实际任务执行类
      */
     public void initMessage(Map<String, ExecuteTaskService> executeTaskServiceMap) {
-        Set<Tuple> set = DELAY_CYCLE_QUEUE.getAllDelayMessage();
+        Set<Tuple> set = delayCycleQueue.getAllDelayMessage();
         TaskNode taskNode = null;
         ExecuteTaskService taskService = null;
         for (Tuple tuple : set) {
@@ -52,11 +52,12 @@ public class ThreadExecute {
             }
         }
 
-        DELAY_CYCLE_QUEUE.initCurrentIndex();
+        delayCycleQueue.initCurrentIndex();
     }
 
     public void run() {
-        ScheduledFuture scheduledFuture = executorService.scheduleAtFixedRate(new TaskRunnable(this.DELAY_CYCLE_QUEUE), 2, 1, TimeUnit.SECONDS);
+        ScheduledFuture scheduledFuture = executorService.scheduleAtFixedRate(
+                new TaskRunnable(this.delayCycleQueue), 2, 1, TimeUnit.SECONDS);
     }
 
 

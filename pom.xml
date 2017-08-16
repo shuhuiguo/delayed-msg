@@ -83,7 +83,7 @@
     </profiles>
     <build>
         <!-- 打包名称使用包名+版本号 -->
-        <!--<finalName>${project.description}</finalName>-->
+        <finalName>${project.description}</finalName>
         <plugins>
 
             <plugin>
@@ -115,6 +115,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+
                 <configuration>
 
                     <excludes>

@@ -27,7 +27,7 @@ public class Main {
             @Override
             public void run() {
                 //程序退出时，把当前节点index写入redis
-                ThreadExecute.DELAY_CYCLE_QUEUE.syncCurrentIndex();
+                ThreadExecute.delayCycleQueue.syncCurrentIndex();
             }
         });
         main.execute.run();
