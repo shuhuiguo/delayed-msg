@@ -131,7 +131,7 @@ public class DelayCycleQueue {
      */
     public void addMessage(int nodeIndex,Task task) {
         this.getQueues().get(nodeIndex).getTasks().add(task);
-        syncNodeData(nodeIndex,this.getQueues().get(nodeIndex));
+        syncNodeData(this.getQueues().get(nodeIndex));
     }
 
     public void initCurrentIndex() {
@@ -175,16 +175,15 @@ public class DelayCycleQueue {
                     taskNode.getTasks().remove(task);
                 }
             }
-          syncNodeData(taskNode.getNodeIndex(),taskNode);
+          syncNodeData(taskNode);
         }
     }
 
     /**
      * 同步节点数据到redis
-     * @param nodeIndex
      * @param taskNode
      */
-    public void syncNodeData(int nodeIndex,TaskNode taskNode){
+    public void syncNodeData(TaskNode taskNode){
         //落地数据
         RedisUtil.getInstance().removeZsetByScore(REDIS_QUEUE_KEY,taskNode.getNodeIndex());
         RedisUtil.getInstance().zadd(REDIS_QUEUE_KEY,taskNode.getNodeIndex(), JSONObject.toJSONString(taskNode));
