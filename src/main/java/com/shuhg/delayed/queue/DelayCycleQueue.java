@@ -1,8 +1,8 @@
-package com.shuhg.queue;
+package com.shuhg.delayed.queue;
 
 import com.alibaba.fastjson.JSONObject;
-import com.shuhg.service.ExecuteTaskService;
-import com.shuhg.utils.RedisUtil;
+import com.shuhg.delayed.utils.RedisUtil;
+import com.shuhg.delayed.service.ExecuteTaskService;
 import redis.clients.jedis.Tuple;
 
 import java.util.*;
@@ -130,18 +130,21 @@ public class DelayCycleQueue {
      * @param task 任务
      */
     public void addMessage(int nodeIndex,Task task) {
-        this.getQueues().get(nodeIndex).getTasks().add(task);
-        syncNodeData(this.getQueues().get(nodeIndex));
+        int node =getCurrentIndex()+nodeIndex;
+        this.getQueues().get(node).getTasks().add(task);
+        syncNodeData(this.getQueues().get(node));
     }
 
-    public void initCurrentIndex() {
+    public int initCurrentIndex() {
 
         String index = RedisUtil.getInstance().get(REDIS_DELAY_QUEUE_CURRENT_INDEX);
         if(index == null){
             setCurrentIndex(0);
+            return 0;
         }else {
             setCurrentIndex(Integer.parseInt(index));
         }
+        return Integer.parseInt(index);
 
     }
     public void setCurrentIndex(int index){

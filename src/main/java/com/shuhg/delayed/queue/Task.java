@@ -1,6 +1,6 @@
-package com.shuhg.queue;
+package com.shuhg.delayed.queue;
 
-import com.shuhg.service.ExecuteTaskService;
+import com.shuhg.delayed.service.ExecuteTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,6 @@ public class Task {
                 if ((now.getTime()-this.executeDate.getTime() ) > 5000) {
                     //TODO 暂时取消 实际不判断时间有效期
                     //taskService.taskFun(this.delayMessage);
-                }else {
                     LOGGER.warn("当前时间--{}与任务预期执行时间--{}相差大于5S",df.format(now),df.format(this.executeDate.getTime()));
                 }
                 return true;

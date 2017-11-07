@@ -1,7 +1,9 @@
-package com.shuhg.service;
+package com.shuhg.delayed.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.shuhg.queue.*;
+import com.shuhg.delayed.queue.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Tuple;
 
 import java.util.Map;
@@ -15,8 +17,10 @@ import java.util.concurrent.TimeUnit;
  * Created by 大舒 on 2017/8/11.
  */
 public class ThreadExecute {
+    private static Logger logger = LoggerFactory.getLogger(ThreadExecute.class);
     public static DelayCycleQueue delayCycleQueue = new DelayCycleQueue();
-    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private static ScheduledExecutorService executorService = null;
+
 
     public void addMessage(DelayMessage delayMessage, ExecuteTaskService executeTaskService) {
         delayCycleQueue.addMessage(delayMessage, executeTaskService);
@@ -31,6 +35,7 @@ public class ThreadExecute {
      * @param executeTaskServiceMap 消息类型-实际任务执行类
      */
     public void initMessage(Map<String, ExecuteTaskService> executeTaskServiceMap) {
+
         Set<Tuple> set = delayCycleQueue.getAllDelayMessage();
         TaskNode taskNode = null;
         ExecuteTaskService taskService = null;
@@ -52,7 +57,8 @@ public class ThreadExecute {
             }
         }
 
-        delayCycleQueue.initCurrentIndex();
+       int initIndex =  delayCycleQueue.initCurrentIndex();
+        logger.info("初始化消息：节点index -- {} ,数据大小 -- {} ",initIndex,set.size());
     }
 
     public void run() {
@@ -60,5 +66,10 @@ public class ThreadExecute {
                 new TaskRunnable(this.delayCycleQueue), 2, 1, TimeUnit.SECONDS);
     }
 
-
+    public static void shutdownNow(){
+        executorService.shutdownNow();
+    }
+    public static void init(){
+        executorService =  Executors.newScheduledThreadPool(1);
+    }
 }

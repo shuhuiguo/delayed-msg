@@ -1,6 +1,6 @@
-package com.shuhg.utils;
+package com.shuhg.delayed.utils;
 
-import com.shuhg.Main;
+import com.shuhg.delayed.Main;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -75,7 +75,12 @@ public class RedisUtil {
      */
     public void initJedisPool() {
         try {
-            String path = Main.class.getClass().getResource("/").getPath() + "redis.properties";
+            String path = null;
+            if(Main.class.getClassLoader().getResource("/") == null){
+                path = Main.class.getClass().getResource("/").getPath() + "redis.properties";
+            }else {
+                path = Main.class.getClassLoader().getResource("/").getPath() + "redis.properties";
+            }
             Properties pps = PropertiesUtil.getProperties(path);
             JedisPoolConfig config = new JedisPoolConfig();
             config.setMaxTotal(Integer.parseInt(pps.getProperty(maxTotal)));

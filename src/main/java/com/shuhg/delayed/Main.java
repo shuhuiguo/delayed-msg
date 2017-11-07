@@ -1,9 +1,9 @@
-package com.shuhg;
+package com.shuhg.delayed;
 
-import com.shuhg.queue.DelayMessage;
-import com.shuhg.service.DefaultExecuteTaskServiceImpl;
-import com.shuhg.service.ExecuteTaskService;
-import com.shuhg.service.ThreadExecute;
+import com.shuhg.delayed.queue.DelayMessage;
+import com.shuhg.delayed.service.DefaultExecuteTaskServiceImpl;
+import com.shuhg.delayed.service.ExecuteTaskService;
+import com.shuhg.delayed.service.ThreadExecute;
 
 /**
  * Created by 大舒 on 2017/8/11.
@@ -23,13 +23,16 @@ public class Main {
         delayMessage.setDelayTime("0.2h,10s,20");
         delayMessage.setMsg("test msg!");
         main.execute.addMessage(delayMessage,defaultService);
+        ThreadExecute.init();
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run() {
                 //程序退出时，把当前节点index写入redis
                 ThreadExecute.delayCycleQueue.syncCurrentIndex();
+                ThreadExecute.shutdownNow();
             }
         });
+
         main.execute.run();
     }
 
