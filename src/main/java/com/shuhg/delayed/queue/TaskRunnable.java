@@ -23,7 +23,7 @@ public class TaskRunnable implements Runnable {
     @Override
     public void run() {
         SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
-        LOGGER.debug("开始执行：{}   当前节点：{}", delayCycleQueue.getCurrentIndex() ,df.format(new Date()));
+        LOGGER.debug("开始执行：{}   当前节点：{}",df.format(new Date()), delayCycleQueue.getCurrentIndex());
         //当节点大于3600，重新开始循环
         if (delayCycleQueue.getCurrentIndex()>= 3600) {
             delayCycleQueue.setCurrentIndex(0);

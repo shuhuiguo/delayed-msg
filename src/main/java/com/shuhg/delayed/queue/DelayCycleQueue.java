@@ -171,11 +171,14 @@ public class DelayCycleQueue {
     public void run(int nodeIndex) {
 
         TaskNode taskNode = this.getQueues().get(nodeIndex);
+
         if (taskNode.getTasks().size() > 0) {
-            for (Task task : taskNode.getTasks()) {
+            Iterator<Task> iterator = taskNode.getTasks().iterator();
+            while (iterator.hasNext()){
+                Task task = iterator.next();
                 boolean rs = task.run();
-                if (rs) {
-                    taskNode.getTasks().remove(task);
+                if(rs) {
+                    iterator.remove();
                 }
             }
           syncNodeData(taskNode);
