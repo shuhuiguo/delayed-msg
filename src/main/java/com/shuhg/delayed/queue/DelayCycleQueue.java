@@ -22,7 +22,9 @@ public class DelayCycleQueue {
      * 任务环
      */
     private static List<TaskNode> taskNodes = new ArrayList<>();
-    //private static
+    /**
+     * 当前执行节点
+     */
     private static AtomicInteger currentIndex = new AtomicInteger(0);
 
     /**
@@ -135,33 +137,47 @@ public class DelayCycleQueue {
         syncNodeData(this.getQueues().get(node));
     }
 
+    /**
+     * 从redis初始化数据
+     * @return
+     */
     public int initCurrentIndex() {
 
         String index = RedisUtil.getInstance().get(REDIS_DELAY_QUEUE_CURRENT_INDEX);
         if(index == null){
-            setCurrentIndex(0);
+            addAndGetCurrentIndex(0);
             return 0;
         }else {
-            setCurrentIndex(Integer.parseInt(index));
+            addAndGetCurrentIndex(Integer.parseInt(index));
         }
         return Integer.parseInt(index);
 
     }
-    public void setCurrentIndex(int index){
-        this.currentIndex.getAndSet(index);
-    }
+
+
 
     public int getCurrentIndex(){
         return this.currentIndex.get();
     }
+    /**
+     * 更新当前执行节点
+     * @param index
+     */
     public int addAndGetCurrentIndex(int index){
         return this.currentIndex.addAndGet(index);
     }
 
+    /**
+     * 同步当前节点到redis
+     */
     public void syncCurrentIndex(){
         RedisUtil.getInstance().set(REDIS_DELAY_QUEUE_CURRENT_INDEX,String.valueOf(getCurrentIndex()));
     }
 
+    /**
+     * 得到redis所有数据
+     * @return
+     */
     public Set<Tuple> getAllDelayMessage(){
        return RedisUtil.getInstance().zrange(REDIS_QUEUE_KEY,0,-1);
     }
