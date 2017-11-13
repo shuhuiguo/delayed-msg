@@ -22,7 +22,7 @@ public class ThreadExecute {
     private static ScheduledExecutorService executorService = null;
 
 
-    public void addMessage(DelayMessage delayMessage, ExecuteTaskService executeTaskService) {
+    public void addMessage(DelayMessage delayMessage, ExecuteTaskProcessor executeTaskService) {
         delayCycleQueue.addMessage(delayMessage, executeTaskService);
     }
 
@@ -34,11 +34,11 @@ public class ThreadExecute {
      * 初始化消息
      * @param executeTaskServiceMap 消息类型-实际任务执行类
      */
-    public void initMessage(Map<String, ExecuteTaskService> executeTaskServiceMap) {
+    public void initMessage(Map<String, ExecuteTaskProcessor> executeTaskServiceMap) {
 
         Set<Tuple> set = delayCycleQueue.getAllDelayMessage();
         TaskNode taskNode = null;
-        ExecuteTaskService taskService = null;
+        ExecuteTaskProcessor taskService = null;
         for (Tuple tuple : set) {
             taskNode = JSONObject.parseObject(tuple.getElement(), TaskNode.class);
             if (taskNode.getTasks() != null && taskNode.getTasks().size() > 0) {
@@ -46,7 +46,7 @@ public class ThreadExecute {
 
                     //默认
                     if (executeTaskServiceMap == null || executeTaskServiceMap.get(task.getDelayMessage().getType()) == null) {
-                        taskService = new DefaultExecuteTaskServiceImpl();
+                        taskService = new DefaultExecuteTaskProcessor();
                     }else {
                         taskService = executeTaskServiceMap.get(task.getDelayMessage().getType());
                     }

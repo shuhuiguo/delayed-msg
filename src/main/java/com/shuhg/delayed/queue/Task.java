@@ -1,6 +1,6 @@
 package com.shuhg.delayed.queue;
 
-import com.shuhg.delayed.service.ExecuteTaskService;
+import com.shuhg.delayed.service.ExecuteTaskProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +29,9 @@ public class Task {
     /**
      * 实际方法执行类
      */
-    private ExecuteTaskService taskService;
+    private ExecuteTaskProcessor taskService;
     public Task(){}
-    public Task(int cycleNum, DelayMessage delayMessage, ExecuteTaskService taskService) {
+    public Task(int cycleNum, DelayMessage delayMessage, ExecuteTaskProcessor taskService) {
         this.cycleNum = cycleNum;
         this.delayMessage = delayMessage;
         this.taskService = taskService;
@@ -94,7 +94,7 @@ public class Task {
         this.delayMessage = delayMessage;
     }
 
-    public void setTaskService(ExecuteTaskService taskService) {
+    public void setTaskService(ExecuteTaskProcessor taskService) {
         this.taskService = taskService;
     }
 }

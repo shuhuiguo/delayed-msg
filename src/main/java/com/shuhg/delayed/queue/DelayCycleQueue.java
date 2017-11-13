@@ -2,7 +2,7 @@ package com.shuhg.delayed.queue;
 
 import com.alibaba.fastjson.JSONObject;
 import com.shuhg.delayed.utils.RedisUtil;
-import com.shuhg.delayed.service.ExecuteTaskService;
+import com.shuhg.delayed.service.ExecuteTaskProcessor;
 import redis.clients.jedis.Tuple;
 
 import java.util.*;
@@ -62,7 +62,7 @@ public class DelayCycleQueue {
      * @param taskService
      * @return
      */
-    public List<TaskNode> addMessage(DelayMessage delayMessage, ExecuteTaskService taskService) {
+    public List<TaskNode> addMessage(DelayMessage delayMessage, ExecuteTaskProcessor taskService) {
         String time = delayMessage.getDelayTime();
         Calendar calendar = Calendar.getInstance();
         if (time != null && !time.trim().equals("")) {

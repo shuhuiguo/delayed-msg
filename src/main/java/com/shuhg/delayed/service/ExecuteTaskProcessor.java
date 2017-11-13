@@ -5,6 +5,6 @@ import com.shuhg.delayed.queue.DelayMessage;
 /**
  * Created by 大舒 on 2017/8/11.
  */
-public interface ExecuteTaskService {
+public interface ExecuteTaskProcessor {
     void taskFun(DelayMessage delayMessage);
 }

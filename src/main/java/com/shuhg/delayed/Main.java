@@ -1,8 +1,8 @@
 package com.shuhg.delayed;
 
 import com.shuhg.delayed.queue.DelayMessage;
-import com.shuhg.delayed.service.DefaultExecuteTaskServiceImpl;
-import com.shuhg.delayed.service.ExecuteTaskService;
+import com.shuhg.delayed.service.DefaultExecuteTaskProcessor;
+import com.shuhg.delayed.service.ExecuteTaskProcessor;
 import com.shuhg.delayed.service.ThreadExecute;
 
 /**
@@ -18,7 +18,7 @@ public class Main {
     }
     public static void main(String[] args) {
         Main main = new Main();
-        ExecuteTaskService defaultService= new DefaultExecuteTaskServiceImpl();
+        ExecuteTaskProcessor defaultService= new DefaultExecuteTaskProcessor();
         DelayMessage delayMessage = new DelayMessage();
         delayMessage.setDelayTime("0.2h,10s,20");
         delayMessage.setMsg("test msg!");
