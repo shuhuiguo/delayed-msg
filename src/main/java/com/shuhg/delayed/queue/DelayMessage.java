@@ -43,6 +43,11 @@ public class DelayMessage {
      */
     private String method;
 
+    /**
+     * 消息产生时间戳
+     */
+    private Long timestamp;
+
     public String getMsgId() {
         return msgId;
     }
@@ -105,6 +110,14 @@ public class DelayMessage {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override

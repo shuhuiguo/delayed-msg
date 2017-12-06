@@ -23,6 +23,7 @@ public class ThreadExecute {
 
 
     public void addMessage(DelayMessage delayMessage, ExecuteTaskProcessor executeTaskService) {
+        delayMessage.setTimestamp(System.currentTimeMillis());
         delayCycleQueue.addMessage(delayMessage, executeTaskService);
     }
 
