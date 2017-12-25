@@ -26,7 +26,7 @@ public class TaskRunnable implements Runnable {
         LOGGER.debug("开始执行：{}   当前节点：{}",df.format(new Date()), delayCycleQueue.getCurrentIndex());
         //当节点大于3600，重新开始循环
         if (delayCycleQueue.getCurrentIndex()>= 3600) {
-            delayCycleQueue.addAndGetCurrentIndex(0);
+            delayCycleQueue.getAndSetCunrrentIndex(0);
         }
         //TODO 同步index到redis
         final int index = delayCycleQueue.getCurrentIndex();

@@ -145,10 +145,10 @@ public class DelayCycleQueue {
 
         String index = RedisUtil.getInstance().get(REDIS_DELAY_QUEUE_CURRENT_INDEX);
         if(index == null){
-            addAndGetCurrentIndex(0);
+            getAndSetCunrrentIndex(0);
             return 0;
         }else {
-            addAndGetCurrentIndex(Integer.parseInt(index));
+            getAndSetCunrrentIndex(Integer.parseInt(index));
         }
         return Integer.parseInt(index);
 
@@ -167,6 +167,9 @@ public class DelayCycleQueue {
         return this.currentIndex.addAndGet(index);
     }
 
+    public int getAndSetCunrrentIndex(int index){
+        return this.currentIndex.getAndSet(index);
+    }
     /**
      * 同步当前节点到redis
      */
